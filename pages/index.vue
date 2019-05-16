@@ -324,13 +324,9 @@ export default {
       return _.filter(operations, (operation) => operation.source && operation.source.indexOf('AUTH') !== -1)
     },
     authText(transaction) {
-      console.log(
-        moment(transaction.valid_before).diff(transaction.created_at, 'seconds')
-      )
-
       return `
-      ${moment(transaction.created_at).format('MMMM Do YYYY, h:mma')}
-      — ${moment(transaction.valid_before).format('MMMM Do YYYY, h:mma')}
+        ${moment(transaction.created_at).format('MMMM Do YYYY, h:mma')}
+        — ${moment(transaction.valid_before).format('MMMM Do YYYY, h:mma')}
       `
     }
   }
