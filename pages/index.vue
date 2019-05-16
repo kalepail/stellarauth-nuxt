@@ -453,13 +453,14 @@ p {
     font-size: 14px;
     color: $ui-3;
     margin-top: 5px;
+    line-height: 1.5;
   }
   .link {
     background-color: $bm-blue;
     color: $ui-9;
     border-radius: $radius;
     padding: 5px 8px;
-    margin: 0 5px;
+    white-space: nowrap;
 
     &:hover {
       background-color: darken($bm-blue, 5%);
