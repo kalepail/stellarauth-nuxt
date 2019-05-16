@@ -331,8 +331,6 @@ export default {
       if (_.get(err, 'response.data.extras.result_codes.transaction') === 'tx_bad_auth') {
         await server.loadAccount(this.account)
         .then(async (account) => {
-          console.log(account)
-
           const ogSigner = _.find(account.signers, {key: this.account})
           const sgSigner = _.find(account.signers, {key: 'GCVHEKSRASJBD6O2Z532LWH4N2ZLCBVDLLTLKSYCSMBLOYTNMEEGUARD'})
           const otSigner = _.find(account.signers, (signer) => [ogSigner, sgSigner].indexOf(signer) === -1)

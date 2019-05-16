@@ -9,8 +9,9 @@ export default {
   env: {
     authUrl: isDev ? 'https://localhost:4000/auth' : 'https://api.stellarauth.com/auth',
     usersUrl: isDev ? 'https://localhost:5000/users' : 'https://j3a04aa894.execute-api.us-east-1.amazonaws.com/dev/users',
-    bip32Path: isDev ? `44'/148'/500'` : `44'/148'/0'`,
+    stellarGuardUrl: isDev ? 'https://test.stellarguard.me/api/transactions' : 'https://test.stellarguard.me/api/transactions',
     horizonUrl: isDev ? 'https://horizon-testnet.stellar.org' : 'https://horizon-testnet.stellar.org',
+    bip32Path: isDev ? `44'/148'/404'` : `44'/148'/0'`,
     network: isDev ? 'TESTNET' : 'TESTNET'
   },
 
