@@ -83,12 +83,12 @@
       <button class="button plain" @click="signOut" type="button">Sign Out</button>
     </div>
 
-    <ul class="previous-auth">
-      <h2>Previous authorizations ({{transactions.length}})</h2>
+    <ul class="previous-auth" v-if="previous_authorizations">
+      <h2>Previous authorizations ({{previous_authorizations.length}})</h2>
       
-      <ul v-for="transaction in parsedTransactions(transactions)" :key="transaction.id">
-        <li v-for="(operation, i) in parsedRecords(transaction.operations)" :key="i">
-          <a :href="transaction._links.self.href" v-html="authText(transaction)" target="_blank"></a>
+      <ul v-for="transaction in previous_authorizations" :key="transaction.id">
+        <li v-for="(operation, i) in transaction.operations" :key="i">
+          <a :href="transaction._links.self.href" v-html="authText(transaction, operation)" target="_blank"></a>
         </li>
       </ul>
     </ul>
@@ -146,6 +146,16 @@ export default {
       : _.get(this, 'error.message')
       ? `${this.error.message}.`
       : 'Something went wrong please try again.'
+    },
+    previous_authorizations() {
+      return _
+      .chain(this.transactions)
+      .orderBy('created_at', 'desc')
+      .map((transaction) => {
+        transaction.operations = _.filter(transaction.operations, (operation) => operation.source && operation.source.indexOf('AUTH') !== -1)
+        return transaction
+      })
+      .value()
     }
   },
   created() {
@@ -317,16 +327,13 @@ export default {
         this.error = _.get(err, 'response.data')
     },
 
-    parsedTransactions(transactions) {
-      return _.orderBy(transactions, 'created_at', 'desc')
-    },
-    parsedRecords(operations) {
-      return _.filter(operations, (operation) => operation.source && operation.source.indexOf('AUTH') !== -1)
-    },
-    authText(transaction) {
+    authText(tx, op) {
       return `
-        ${moment(transaction.created_at).format('MMMM Do YYYY, h:mma')}
-        — ${moment(transaction.valid_before).format('MMMM Do YYYY, h:mma')}
+        ${moment(tx.created_at).format('MMMM Do YYYY, h:mma')}
+        — ${moment(tx.valid_before).format('MMMM Do YYYY, h:mma')}
+        <br>
+        ${op.destination.substring(0, 6)}...${op.destination.substring(50, 56)}
+        → ${op.source.substring(0, 6)}...${op.source.substring(50, 56)}
       `
     }
   }
