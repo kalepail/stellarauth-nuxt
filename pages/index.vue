@@ -39,7 +39,7 @@
     <div v-else-if="!user">
       <div class="label">
         Login transaction XDR
-        <span v-if="stellarGuard">Sign and submit with <a class="link" :href="stellarGuard.url" target="_blank">StellarGuard</a> before verifying below.</span>
+        <span v-if="stellarGuard">Sign and submit with <a class="link" :href="stellarGuard.url" target="_blank"><img src="~/assets/images/stellarguard.svg"> StellarGuard</a> before verifying below.</span>
         <span v-else>Sign and submit (e.g. <a class="link" :href="transaction_link" target="_blank">Stellar.org</a>) before verifying below.</span>
 
         <pre v-html="transaction.transaction" v-if="transaction"></pre>
@@ -453,15 +453,25 @@ p {
     color: $ui-3;
     margin-top: 5px;
     line-height: 1.5;
+    display: flex;
+    align-items: center;
   }
   .link {
+    display: inline-flex;
+    align-items: center;
     background-color: $bm-blue;
     color: $ui-9;
     border-radius: $radius;
-    padding: 4px 8px 6px;
+    padding: 5px 8px;
+    margin: 0 5px;
 
     &:hover {
       background-color: darken($bm-blue, 5%);
+    }
+    img {
+      width: 20px;
+      height: 20px;
+      margin-right: 6px;
     }
   }
   .copy {
