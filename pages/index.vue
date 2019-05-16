@@ -15,7 +15,7 @@
       <label class="label">
         Stellar account
         <div class="actions">
-          <input type="text" placeholder="GCVU2 ... 7CJDJ" v-model="account">
+          <input type="text" placeholder="GCVU2 ... 7CYDJ" v-model="account">
 
           <button class="button" type="submit" @mousedown="useLedger = false">
             <vue-loader v-show="!useLedger && loading" />
@@ -453,13 +453,8 @@ p {
     font-size: 14px;
     color: $ui-3;
     margin-top: 5px;
-    line-height: 1.5;
-    display: flex;
-    align-items: center;
   }
   .link {
-    display: inline-flex;
-    align-items: center;
     background-color: $bm-blue;
     color: $ui-9;
     border-radius: $radius;
@@ -472,7 +467,10 @@ p {
     img {
       width: 20px;
       height: 20px;
-      margin-right: 6px;
+      margin-right: 2px;
+      display: inline-block;
+      position: relative;
+      top: 4px;
     }
   }
   .copy {
