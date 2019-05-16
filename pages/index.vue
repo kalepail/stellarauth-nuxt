@@ -540,6 +540,7 @@ pre {
       font-size: 14px;
       color: $ui-3;
       margin-bottom: 5px;
+      font-variant-numeric: lining-nums tabular-nums;
 
       a {
         color: inherit;
