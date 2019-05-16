@@ -335,8 +335,6 @@ export default {
           const sgSigner = _.find(account.signers, {key: 'GCVHEKSRASJBD6O2Z532LWH4N2ZLCBVDLLTLKSYCSMBLOYTNMEEGUARD'})
           const otSigner = _.find(account.signers, (signer) => [ogSigner, sgSigner].indexOf(signer) === -1)
 
-          console.log(otSigner)
-
           if (
             ogSigner
             && ogSigner.weight === 10
@@ -346,14 +344,8 @@ export default {
             && sgSigner.weight === 1
             && _.filter(account.thresholds, (value) => value === 20).length === 3 
           ) await this.sendStellarGuard()
-          
-          else
-            this.stellarGuard = null
         })
-        .catch((err) => {
-          console.error(err)
-          this.stellarGuard = null
-        })
+        .catch((err) => console.error(err))
 
         if (this.stellarGuard)
           return
