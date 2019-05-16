@@ -162,7 +162,8 @@ export default {
       .value()
     },
     transaction_link() {
-      return `https://www.stellar.org/laboratory/#txsigner?xdr=${encodeURIComponent(this.transaction.transaction)}&network=test`
+      if (this.transaction)
+        return `https://www.stellar.org/laboratory/#txsigner?xdr=${encodeURIComponent(this.transaction.transaction)}&network=test`
     }
   },
   created() {
