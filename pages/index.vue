@@ -155,6 +155,7 @@ export default {
         transaction.operations = _.filter(transaction.operations, (operation) => operation.source && operation.source.indexOf('AUTH') !== -1)
         return transaction
       })
+      .filter((transaction) => transaction.operations.length)
       .value()
     }
   },
