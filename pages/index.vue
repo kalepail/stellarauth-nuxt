@@ -520,7 +520,7 @@ pre {
   word-break: break-all;
   font-size: 14px;
   color: $ui-3;
-  line-height: 1.2;
+  line-height: 1.3;
   margin-top: 20px;
 }
 .button {
