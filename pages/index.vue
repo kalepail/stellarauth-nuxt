@@ -26,7 +26,6 @@
 
       <label class="label" v-if="hasWebAuthn">
         Ledger path
-
         <div class="actions">
           <input type="text" placeholder="44'/148'/0'" v-model="bip32Path">
           <button class="button" type="submit" @mousedown="useLedger = true">
@@ -40,7 +39,9 @@
     <div v-else-if="!user">
       <div class="label">
         Login transaction XDR
-        <span>Sign and submit (e.g. <a :href="transaction.link" target="_blank">Stellar.org</a>) before verifying below.</span>
+        <span v-if="stellarGuard">Sign and submit with <a class="link" :href="stellarGuard.url" target="_blank">StellarGuard</a> before verifying below.</span>
+        <span v-else>Sign and submit (e.g. <a class="link" :href="transaction_link" target="_blank">Stellar.org</a>) before verifying below.</span>
+
         <pre v-html="transaction.transaction" v-if="transaction"></pre>
         <button class="button copy" @click="copy" type="button"> {{copied ? '✔︎ Copied' : 'Copy'}}</button>
       </div>
@@ -119,6 +120,8 @@ const data = {
   transaction: null,
   user: null,
 
+  stellarGuard: null,
+
   useLedger: false,
   bip32Path: process.env.bip32Path,
   hasWebAuthn: !!navigator.credentials,
@@ -157,6 +160,9 @@ export default {
       })
       .filter((transaction) => transaction.operations.length)
       .value()
+    },
+    transaction_link() {
+      return `https://www.stellar.org/laboratory/#txsigner?xdr=${encodeURIComponent(this.transaction.transaction)}&network=test`
     }
   },
   created() {
@@ -304,8 +310,56 @@ export default {
       .finally(() => this.loading = false)
     },
 
-    handleError(err) {
+    sendStellarGuard() {
+      this.error = null
+      this.loading = true
+
+      return this.$axios.post(process.env.stellarGuardUrl, {
+        xdr: this.transaction.transaction
+      })
+      .then(({data}) => {
+        this.stellarGuard = data
+        window.open(data.url, '_blank')
+      })
+      .catch(this.handleError)
+      .finally(() => this.loading = false)
+    },
+
+    async handleError(err) {
       console.error(err)
+
+      if (_.get(err, 'response.data.extras.result_codes.transaction') === 'tx_bad_auth') {
+        await server.loadAccount(this.account)
+        .then(async (account) => {
+          console.log(account)
+
+          const ogSigner = _.find(account.signers, {key: this.account})
+          const sgSigner = _.find(account.signers, {key: 'GCVHEKSRASJBD6O2Z532LWH4N2ZLCBVDLLTLKSYCSMBLOYTNMEEGUARD'})
+          const otSigner = _.find(account.signers, (signer) => [ogSigner, sgSigner].indexOf(signer) === -1)
+
+          console.log(otSigner)
+
+          if (
+            ogSigner
+            && ogSigner.weight === 10
+            && otSigner
+            && otSigner.weight === 10
+            && sgSigner
+            && sgSigner.weight === 1
+            && _.filter(account.thresholds, (value) => value === 20).length === 3 
+          ) await this.sendStellarGuard()
+          
+          else
+            this.stellarGuard = null
+        })
+        .catch((err) => {
+          console.error(err)
+          this.stellarGuard = null
+        })
+
+        if (this.stellarGuard)
+          return
+      }
 
       if (_.get(err, 'response.data.message', '').indexOf('expired') !== -1) {
         this.signOut()
@@ -376,7 +430,6 @@ p {
   font-size: 14px;
   color: $ui-3;
   margin-bottom: 20px;
-  font-weight: 400;
   text-align: center;
   line-height: 1.3;
 
@@ -414,7 +467,7 @@ p {
     margin-top: 5px;
     line-height: 1.5;
   }
-  a {
+  .link {
     background-color: $bm-blue;
     color: $ui-9;
     border-radius: $radius;
