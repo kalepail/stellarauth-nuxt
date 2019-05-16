@@ -11,7 +11,7 @@ export default {
     usersUrl: isDev ? 'https://localhost:5000/users' : 'https://j3a04aa894.execute-api.us-east-1.amazonaws.com/dev/users',
     stellarGuardUrl: isDev ? 'https://test.stellarguard.me/api/transactions' : 'https://test.stellarguard.me/api/transactions',
     horizonUrl: isDev ? 'https://horizon-testnet.stellar.org' : 'https://horizon-testnet.stellar.org',
-    bip32Path: isDev ? `44'/148'/404'` : `44'/148'/0'`,
+    bip32Path: isDev ? `44'/148'/500'` : `44'/148'/0'`,
     network: isDev ? 'TESTNET' : 'TESTNET'
   },
 
