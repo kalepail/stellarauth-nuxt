@@ -330,7 +330,7 @@ export default {
 
     authText(tx, op) {
       return `
-        ${moment(tx.created_at).format('MMMM Do YYYY, h:mma')}
+        ${moment(tx.valid_after).format('MMMM Do YYYY, h:mma')}
         — ${moment(tx.valid_before).format('MMMM Do YYYY, h:mma')}
         <br>
         ${op.destination.substring(0, 6)}...${op.destination.substring(50, 56)}
