@@ -84,7 +84,7 @@
     </div>
 
     <ul class="previous-auth">
-      <h2>Previous authorizations</h2>
+      <h2>Previous authorizations ({{transactions.length}})</h2>
       
       <ul v-for="transaction in parsedTransactions(transactions)" :key="transaction.id">
         <li v-for="(operation, i) in parsedRecords(transaction.operations)" :key="i">
