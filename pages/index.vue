@@ -331,17 +331,14 @@ export default {
       if (_.get(err, 'response.data.extras.result_codes.transaction') === 'tx_bad_auth') {
         await server.loadAccount(this.account)
         .then(async (account) => {
-          const ogSigner = _.find(account.signers, {key: this.account})
-          const sgSigner = _.find(account.signers, {key: 'GCVHEKSRASJBD6O2Z532LWH4N2ZLCBVDLLTLKSYCSMBLOYTNMEEGUARD'})
-          const otSigner = _.find(account.signers, (signer) => [ogSigner, sgSigner].indexOf(signer) === -1)
+          const ogSigner = _.find(account.signers, {key: this.account, weight: 10})
+          const sgSigner = _.find(account.signers, {key: 'GCVHEKSRASJBD6O2Z532LWH4N2ZLCBVDLLTLKSYCSMBLOYTNMEEGUARD', weight: 1})
+          const otSigner = _.find(account.signers, (signer) => [ogSigner, sgSigner].indexOf(signer) === -1 && signer.weight === 10)
 
           if (
             ogSigner
-            && ogSigner.weight === 10
-            && otSigner
-            && otSigner.weight === 10
             && sgSigner
-            && sgSigner.weight === 1
+            && otSigner
             && _.filter(account.thresholds, (value) => value === 20).length === 3 
           ) await this.sendStellarGuard()
         })
