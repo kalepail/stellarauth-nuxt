@@ -87,9 +87,9 @@
     <ul class="previous-auth" v-if="previous_authorizations">
       <h2>Previous authorizations ({{previous_authorizations.length}})</h2>
       
-      <ul v-for="transaction in previous_authorizations" :key="transaction.id">
-        <li v-for="(operation, i) in transaction.operations" :key="i">
-          <a :href="transaction._links.self.href" v-html="authText(transaction, operation)" target="_blank"></a>
+      <ul v-for="authorization in previous_authorizations" :key="authorization.id">
+        <li v-for="(operation, i) in authorization.operations" :key="i">
+          <a :href="authorization._links.self.href" v-html="authText(authorization, operation)" target="_blank"></a>
         </li>
       </ul>
     </ul>
@@ -162,8 +162,10 @@ export default {
       .value()
     },
     transaction_link() {
-      if (this.transaction)
-        return `https://www.stellar.org/laboratory/#txsigner?xdr=${encodeURIComponent(this.transaction.transaction)}&network=test`
+      if (
+        this.transaction 
+        && this.transaction.transaction
+      ) return `https://www.stellar.org/laboratory/#txsigner?xdr=${encodeURIComponent(this.transaction.transaction)}&network=test`
     }
   },
   created() {
@@ -187,12 +189,10 @@ export default {
         setTimeout(() => this.copied = false, 2000)
     },
     'transaction.auth'() {
-      const auth = _.get(this, 'transaction.auth')
-
-      if (auth) {
-        this.jwt = auth
-        localStorage.setItem('StellarAuth', auth)
-      }
+      this.setJwt()
+    },
+    jwt() {
+      this.setJwt()
     },
     user() {
       if (
@@ -249,6 +249,9 @@ export default {
         }
       })
       .then(async ({data}) => {
+        if (data.auth)
+          this.jwt = data.auth
+
         if (data.memo)
           await this.getUser()
 
@@ -369,6 +372,15 @@ export default {
 
       else
         this.error = _.get(err, 'response.data')
+    },
+
+    setJwt() {
+      const auth = _.get(this, 'transaction.auth', this.jwt)
+
+      if (auth) {
+        this.jwt = auth
+        localStorage.setItem('StellarAuth', auth)
+      }
     },
 
     authText(tx, op) {
