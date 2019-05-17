@@ -155,7 +155,7 @@ export default {
       .chain(this.transactions)
       .orderBy('created_at', 'desc')
       .map((transaction) => {
-        transaction.operations = _.filter(transaction.operations, (operation) => operation.source && operation.source.indexOf('AUTH') !== -1)
+        transaction.operations = _.filter(transaction.operations, (operation) => operation.source && operation.source === 'GDOOANUSKSOZJKQ7TGZPDTEXPRLFSX5FSH22JY2SKESDPWRGGR6PAUTH')
         return transaction
       })
       .filter((transaction) => transaction.operations.length)
@@ -201,6 +201,7 @@ export default {
       ) server
       .transactions()
       .forAccount(this.user.id)
+      .order('desc')
       .limit(100)
       .call()
       .then(async (page) => {
