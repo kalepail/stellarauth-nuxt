@@ -12,7 +12,9 @@ export default {
     stellarGuardUrl: isDev ? 'https://test.stellarguard.me/api/transactions' : 'https://test.stellarguard.me/api/transactions',
     horizonUrl: isDev ? 'https://horizon-testnet.stellar.org' : 'https://horizon-testnet.stellar.org',
     bip32Path: isDev ? `44'/148'/500'` : `44'/148'/0'`,
-    network: isDev ? 'TESTNET' : 'TESTNET'
+    network: isDev ? 'TESTNET' : 'TESTNET',
+    authAccount: 'GDOOANUSKSOZJKQ7TGZPDTEXPRLFSX5FSH22JY2SKESDPWRGGR6PAUTH',
+    stellarGuardAccount: 'GCVHEKSRASJBD6O2Z532LWH4N2ZLCBVDLLTLKSYCSMBLOYTNMEEGUARD'
   },
 
   /*

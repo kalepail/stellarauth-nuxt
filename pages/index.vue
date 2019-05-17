@@ -155,7 +155,7 @@ export default {
       .chain(this.transactions)
       .orderBy('created_at', 'desc')
       .map((transaction) => {
-        transaction.operations = _.filter(transaction.operations, (operation) => operation.source && operation.source === 'GDOOANUSKSOZJKQ7TGZPDTEXPRLFSX5FSH22JY2SKESDPWRGGR6PAUTH')
+        transaction.operations = _.filter(transaction.operations, (operation) => operation.source && operation.source === process.env.authAccount)
         return transaction
       })
       .filter((transaction) => transaction.operations.length)
@@ -337,7 +337,7 @@ export default {
         await server.loadAccount(this.account)
         .then(async (account) => {
           const ogSigner = _.find(account.signers, {key: this.account, weight: 10})
-          const sgSigner = _.find(account.signers, {key: 'GCVHEKSRASJBD6O2Z532LWH4N2ZLCBVDLLTLKSYCSMBLOYTNMEEGUARD', weight: 1})
+          const sgSigner = _.find(account.signers, {key: process.env.stellarGuardAccount, weight: 1})
           const otSigner = _.find(account.signers, (signer) => [ogSigner, sgSigner].indexOf(signer) === -1 && signer.weight === 10)
 
           if (
