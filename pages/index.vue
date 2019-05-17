@@ -174,7 +174,7 @@ export default {
   },
   mounted() {
     this.loadScript(
-      'https://cdnjs.cloudflare.com/ajax/libs/stellar-sdk/1.0.1/stellar-sdk.min.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/stellar-sdk/1.0.2/stellar-sdk.min.js',
       () => {
         StellarSdk.Network.use(
           new StellarSdk.Network(StellarSdk.Networks[process.env.network])
