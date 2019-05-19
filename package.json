@@ -6,7 +6,7 @@
     "build": "nuxt build",
     "start": "nuxt start",
     "generate": "nuxt generate",
-    "deploy": "yarn build && surge ./dist https://stellarauth.com"
+    "deploy": "yarn build && surge ./dist https://demo.stellarauth.com"
   },
   "dependencies": {
     "@ledgerhq/hw-app-str": "^4.56.0",
