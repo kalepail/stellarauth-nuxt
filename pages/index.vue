@@ -244,7 +244,7 @@ export default {
           Authorization: `Bearer ${this.jwt || this.transaction.auth}`
         } : null,
         params: {
-          timeout: 3600,
+          ttl: 3600,
           account: this.account
         }
       })
