@@ -252,7 +252,7 @@ export default {
         if (data.auth)
           this.jwt = data.auth
 
-        if (data.memo)
+        if (data.successful)
           await this.getUser()
 
         else {
