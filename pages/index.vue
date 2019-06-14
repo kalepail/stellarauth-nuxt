@@ -40,7 +40,7 @@
       <div class="label">
         Login transaction XDR
         <span v-if="stellarGuard">Sign and submit with <a class="link" :href="stellarGuard.url" target="_blank"><img src="~/assets/images/stellarguard.svg"> StellarGuard</a> before verifying below.</span>
-        <span v-else>Sign and submit (e.g. <a class="link" :href="transaction_link" target="_blank">Stellar.org</a>) before verifying below.</span>
+        <span v-else>Sign and submit (e.g. <a class="link" :href="laboratory_link" target="_blank">Stellar.org</a> or <a class="link" :href="cosmic_link" target="_blank">Cosmic.link</a>) before verifying below.</span>
 
         <pre v-html="transaction.transaction" v-if="transaction"></pre>
         <button class="button copy" @click="copy" type="button"> {{copied ? '✔︎ Copied' : 'Copy'}}</button>
@@ -161,11 +161,17 @@ export default {
       .filter((transaction) => transaction.operations.length)
       .value()
     },
-    transaction_link() {
+    laboratory_link() {
       if (
         this.transaction 
         && this.transaction.transaction
       ) return `https://www.stellar.org/laboratory/#txsigner?xdr=${encodeURIComponent(this.transaction.transaction)}&network=test`
+    },
+    cosmic_link() {
+      if (
+        this.transaction 
+        && this.transaction.uri
+      ) return `https://cosmic.link?req=${this.transaction.uri}`
     }
   },
   created() {
