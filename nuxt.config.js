@@ -2,19 +2,22 @@ import path from 'path'
 import fs from 'fs'
 
 const isDev = process.env.NODE_ENV !== 'production'
+const isTest = true
 
 export default {
   mode: 'spa',
   dev: isDev,
   env: {
-    authUrl: isDev ? 'https://localhost:4000/auth' : 'https://api-testnet.stellarauth.com/auth',
+    authUrl: isDev ? 'https://localhost:4000/auth' : isTest ? 'https://api-testnet.stellarauth.com/auth' : 'https://api.stellarauth.com/auth',
     usersUrl: isDev ? 'https://localhost:5000/users' : 'https://j3a04aa894.execute-api.us-east-1.amazonaws.com/dev/users',
-    stellarGuardUrl: isDev ? 'https://test.stellarguard.me/api/transactions' : 'https://test.stellarguard.me/api/transactions',
-    horizonUrl: isDev ? 'https://horizon-testnet.stellar.org' : 'https://horizon-testnet.stellar.org',
+    stellarGuardUrl: isDev || isTest ? 'https://test.stellarguard.me/api/transactions' : 'https://stellarguard.me/api/transactions',
+    lobstrVaultUrl: isDev || isTest ? 'https://vault-staging.lobstr.co/api/transactions/' : 'https://vault.lobstr.co/api/transactions/',
+    horizonUrl: isDev || isTest ? 'https://horizon-testnet.stellar.org' : 'https://horizon.stellar.org',
     bip32Path: isDev ? `44'/148'/500'` : `44'/148'/0'`,
-    network: isDev ? 'TESTNET' : 'TESTNET',
+    network: isDev || isTest ? 'TESTNET' : 'PUBLIC',
     authAccount: 'GDOOANUSKSOZJKQ7TGZPDTEXPRLFSX5FSH22JY2SKESDPWRGGR6PAUTH',
-    stellarGuardAccount: 'GCVHEKSRASJBD6O2Z532LWH4N2ZLCBVDLLTLKSYCSMBLOYTNMEEGUARD'
+    stellarGuardAccount: 'GCVHEKSRASJBD6O2Z532LWH4N2ZLCBVDLLTLKSYCSMBLOYTNMEEGUARD',
+    lobstrVaultAccount: 'GA2T6GR7VXXXBETTERSAFETHANSORRYXXXPROTECTEDBYLOBSTRVAULT'
   },
 
   /*

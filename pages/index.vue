@@ -40,7 +40,8 @@
       <div class="label">
         Login transaction XDR
         <span v-if="stellarGuard">Sign and submit with <a class="link" :href="stellarGuard.url" target="_blank"><img src="~/assets/images/stellarguard.svg"> StellarGuard</a> before verifying below.</span>
-        <span v-else>Sign and submit (e.g. <a class="link" :href="laboratory_link" target="_blank">Stellar.org</a> or <a class="link" :href="cosmic_link" target="_blank">Cosmic.link</a>) before verifying below.</span>
+        <span v-if="lobstrVault">Sign and submit with <a class="link" href="https://vault.lobstr.co/" target="_blank"><img src="~/assets/images/lobstrvault.png"> LobstrVault</a> before verifying below.</span>
+        <span v-if="!stellarGuard && !lobstrVault">Sign and submit (e.g. <a class="link" :href="laboratory_link" target="_blank">Stellar.org</a> or <a class="link" :href="cosmic_link" target="_blank">Cosmic.link</a>) before verifying below.</span>
 
         <pre v-html="transaction.transaction" v-if="transaction"></pre>
         <button class="button copy" @click="copy" type="button"> {{copied ? '✔︎ Copied' : 'Copy'}}</button>
@@ -121,6 +122,7 @@ const data = {
   user: null,
 
   stellarGuard: null,
+  lobstrVault: null,
 
   useLedger: false,
   bip32Path: process.env.bip32Path,
@@ -336,27 +338,53 @@ export default {
       .finally(() => this.loading = false)
     },
 
+    sendLobstrVault() {
+      this.error = null
+      this.loading = true
+
+      return this.$axios.post(process.env.lobstrVaultUrl, {
+        xdr: this.transaction.transaction
+      })
+      .then(({data}) => this.lobstrVault = data)
+      .catch(this.handleError)
+      .finally(() => this.loading = false)
+    },
+
     async handleError(err) {
       console.error(err)
 
       if (_.get(err, 'response.data.extras.result_codes.transaction') === 'tx_bad_auth') {
         await server.loadAccount(this.account)
         .then(async (account) => {
+          let otSigner
+
           const ogSigner = _.find(account.signers, {key: this.account, weight: 10})
           const sgSigner = _.find(account.signers, {key: process.env.stellarGuardAccount, weight: 1})
-          const otSigner = _.find(account.signers, (signer) => [ogSigner, sgSigner].indexOf(signer) === -1 && signer.weight === 10)
+                otSigner = _.find(account.signers, (signer) => [ogSigner, sgSigner].indexOf(signer) === -1 && signer.weight === 10)
 
           if (
             ogSigner
             && sgSigner
             && otSigner
             && _.filter(account.thresholds, (value) => value === 20).length === 3 
-          ) await this.sendStellarGuard()
+          ) return await this.sendStellarGuard()
+
+          const lvSigner = _.find(account.signers, {key: process.env.lobstrVaultAccount, weight: 1})
+                otSigner = _.find(account.signers, (signer) => [ogSigner, lvSigner].indexOf(signer) === -1 && signer.weight === 10)
+
+          if (
+            ogSigner
+            && lvSigner
+            && otSigner
+            && _.filter(account.thresholds, (value) => value === 20).length === 3 
+          ) return await this.sendLobstrVault()
         })
         .catch((err) => console.error(err))
 
-        if (this.stellarGuard)
-          return
+        if (
+          this.stellarGuard 
+          || this.lobstrVault
+        ) return
       }
 
       if (_.get(err, 'response.data.message', '').indexOf('expired') !== -1) {
