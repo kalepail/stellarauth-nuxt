@@ -9,14 +9,14 @@
     "deploy": "yarn build && surge ./dist https://demo.stellarauth.com"
   },
   "dependencies": {
-    "@ledgerhq/hw-app-str": "^4.56.0",
-    "@ledgerhq/hw-transport-webauthn": "^4.56.0",
-    "@nuxtjs/axios": "^5.4.1",
-    "bluebird": "^3.5.4",
+    "@ledgerhq/hw-app-str": "^4.61.0",
+    "@ledgerhq/hw-transport-webauthn": "^4.61.0",
+    "@nuxtjs/axios": "^5.5.4",
+    "bluebird": "^3.5.5",
     "copy-to-clipboard": "^3.2.0",
     "lodash-es": "^4.17.11",
     "moment": "^2.24.0",
-    "nuxt": "^2.7.1"
+    "nuxt": "^2.8.1"
   },
   "devDependencies": {
     "node-sass": "^4.12.0",
