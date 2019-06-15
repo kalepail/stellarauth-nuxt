@@ -122,7 +122,7 @@ const data = {
   user: null,
 
   stellarGuard: null,
-  lobstrVault: true, // null,
+  lobstrVault: null,
 
   useLedger: false,
   bip32Path: process.env.bip32Path,
