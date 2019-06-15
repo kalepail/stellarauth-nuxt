@@ -342,16 +342,29 @@ export default {
       if (_.get(err, 'response.data.extras.result_codes.transaction') === 'tx_bad_auth') {
         await server.loadAccount(this.account)
         .then(async (account) => {
+          let otSigner
+
           const ogSigner = _.find(account.signers, {key: this.account, weight: 10})
           const sgSigner = _.find(account.signers, {key: process.env.stellarGuardAccount, weight: 1})
-          const otSigner = _.find(account.signers, (signer) => [ogSigner, sgSigner].indexOf(signer) === -1 && signer.weight === 10)
+                otSigner = _.find(account.signers, (signer) => [ogSigner, sgSigner].indexOf(signer) === -1 && signer.weight === 10)
 
           if (
             ogSigner
             && sgSigner
             && otSigner
             && _.filter(account.thresholds, (value) => value === 20).length === 3 
-          ) await this.sendStellarGuard()
+          ) return await this.sendStellarGuard()
+
+          const lvSigner = _.find(account.signers, {key: process.env.lobstrVaultAccount, weight: 1})
+                otSigner = _.find(account.signers, (signer) => [ogSigner, lvSigner].indexOf(signer) === -1 && signer.weight === 10)
+
+          if (
+            ogSigner
+            && lvSigner
+            && otSigner
+            && _.filter(account.thresholds, (value) => value === 20).length === 3 
+          ) console.log('fired');
+          // return await this.sendStellarGuard()
         })
         .catch((err) => console.error(err))
 
