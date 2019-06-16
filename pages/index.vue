@@ -171,12 +171,12 @@ export default {
       .value()
     },
     laboratory_link() {
-      const {nwk} = jwt.decode(this.jwt)
+      const {network} = jwt.decode(this.jwt)
 
       if (
         this.transaction 
         && this.transaction.transaction
-      ) return `https://www.stellar.org/laboratory/#txsigner?xdr=${encodeURIComponent(this.transaction.transaction)}&network=${nwk}`
+      ) return `https://www.stellar.org/laboratory/#txsigner?xdr=${encodeURIComponent(this.transaction.transaction)}&network=${network}`
     },
     cosmic_link() {
       if (
