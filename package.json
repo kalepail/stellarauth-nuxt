@@ -2,7 +2,8 @@
   "name": "stellarauth",
   "private": true,
   "scripts": {
-    "dev": "nuxt",
+    "dev:test": "NUXT_ENV_NETWORK=test nuxt",
+    "dev:public": "NUXT_ENV_NETWORK=public nuxt",
     "build": "nuxt build",
     "start": "nuxt start",
     "generate": "nuxt generate",
@@ -14,6 +15,7 @@
     "@nuxtjs/axios": "^5.5.4",
     "bluebird": "^3.5.5",
     "copy-to-clipboard": "^3.2.0",
+    "jsonwebtoken": "^8.5.1",
     "lodash-es": "^4.17.11",
     "moment": "^2.24.0",
     "nuxt": "^2.8.1"

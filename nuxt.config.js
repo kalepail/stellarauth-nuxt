@@ -2,7 +2,7 @@ import path from 'path'
 import fs from 'fs'
 
 const isDev = process.env.NODE_ENV !== 'production'
-const isTest = true
+const isTest = process.env.NUXT_ENV_NETWORK !== 'public'
 
 export default {
   mode: 'spa',
@@ -10,14 +10,15 @@ export default {
   env: {
     authUrl: isDev ? 'https://localhost:4000/auth' : isTest ? 'https://api-testnet.stellarauth.com/auth' : 'https://api.stellarauth.com/auth',
     usersUrl: isDev ? 'https://localhost:5000/users' : 'https://j3a04aa894.execute-api.us-east-1.amazonaws.com/dev/users',
-    stellarGuardUrl: isDev || isTest ? 'https://test.stellarguard.me/api/transactions' : 'https://stellarguard.me/api/transactions',
-    lobstrVaultUrl: isDev || isTest ? 'https://vault-staging.lobstr.co/api/transactions/' : 'https://vault.lobstr.co/api/transactions/',
-    horizonUrl: isDev || isTest ? 'https://horizon-testnet.stellar.org' : 'https://horizon.stellar.org',
+    stellarGuardUrl: isTest ? 'https://test.stellarguard.me/api/transactions' : 'https://stellarguard.me/api/transactions',
+    lobstrVaultUrl: isTest ? 'https://vault-staging.lobstr.co/api/transactions/' : 'https://vault.lobstr.co/api/transactions/',
+    horizonUrl: isTest ? 'https://horizon-testnet.stellar.org' : 'https://horizon.stellar.org',
     bip32Path: isDev ? `44'/148'/500'` : `44'/148'/0'`,
-    network: isDev || isTest ? 'TESTNET' : 'PUBLIC',
+    network: isTest ? 'TESTNET' : 'PUBLIC',
     authAccount: 'GDOOANUSKSOZJKQ7TGZPDTEXPRLFSX5FSH22JY2SKESDPWRGGR6PAUTH',
     stellarGuardAccount: 'GCVHEKSRASJBD6O2Z532LWH4N2ZLCBVDLLTLKSYCSMBLOYTNMEEGUARD',
-    lobstrVaultAccount: 'GA2T6GR7VXXXBETTERSAFETHANSORRYXXXPROTECTEDBYLOBSTRVAULT'
+    lobstrVaultAccount: 'GA2T6GR7VXXXBETTERSAFETHANSORRYXXXPROTECTEDBYLOBSTRVAULT',
+    isTest
   },
 
   /*

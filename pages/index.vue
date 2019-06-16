@@ -9,7 +9,7 @@
     <p class="success" v-if="user">Successfully authenticated!</p>
     <p class="error" v-if="error" v-html="error_parsed"></p>
 
-    <p class="info" v-if="!user && !transaction">This is a proof of concept demo using the Stellar network as an authentication method. Use your Stellar account to prove your identity by submitting a transaction to the network. This demo utilizes the Stellar testnet so feel free to <a href="https://www.stellar.org/laboratory/#account-creator?network=test" target="_blank">create and fund a fresh dummy account</a> to try it out.</p>
+    <p class="info" v-if="!user && !transaction">This is a proof of concept demo using the Stellar network as an authentication method. Use your Stellar account to prove your identity by submitting a transaction to the {{isTest ? 'test' : 'public'}} network. <template v-if="isTest">This demo utilizes the Stellar testnet so feel free to <a href="https://www.stellar.org/laboratory/#account-creator?network=test" target="_blank">create and fund a fresh dummy account</a> to try it out.</template></p>
    
     <div v-if="!user && !transaction">
       <label class="label">
@@ -39,9 +39,13 @@
     <div v-else-if="!user">
       <div class="label">
         Login transaction XDR
-        <span v-if="stellarGuard">Sign and submit with <a class="link" :href="stellarGuard.url" target="_blank"><img src="~/assets/images/stellarguard.svg"> StellarGuard</a> before verifying below.</span>
-        <span v-if="lobstrVault">Sign and submit with <a class="link" href="https://vault.lobstr.co/" target="_blank"><img src="~/assets/images/lobstrvault.png"> LobstrVault</a> before verifying below.</span>
-        <span v-if="!stellarGuard && !lobstrVault">Sign and submit (e.g. <a class="link" :href="laboratory_link" target="_blank">Stellar.org</a> or <a class="link" :href="cosmic_link" target="_blank">Cosmic.link</a>) before verifying below.</span>
+        <span v-if="stellarGuard && typeof stellarGuard === 'object'">Sign and submit with <a class="link" :href="stellarGuard.url" target="_blank"><img src="~/assets/images/stellarguard.svg">StellarGuard</a> before verifying below</span>
+        <span v-if="lobstrVault && typeof lobstrVault === 'object'">Sign and submit with <a class="link" href="javascript:void(0)" @click="promptLobstrVault"><img src="~/assets/images/lobstrvault.png">Lobstr Vault</a> before verifying below</span>
+
+        <span v-if="typeof stellarGuard === 'boolean'">Sign the transaction below (e.g. <a class="link" :href="laboratory_link" target="_blank">Stellar.org</a> or <a class="link" :href="cosmic_link" target="_blank">Cosmic.link</a>) before submitting to <a class="link" href="javascript:void(0)" @click="promptStellarGuard"><img src="~/assets/images/stellarguard.svg">StellarGuard</a></span>
+        <span v-if="typeof lobstrVault === 'boolean'">Sign the transaction below (e.g. <a class="link" :href="laboratory_link" target="_blank">Stellar.org</a> or <a class="link" :href="cosmic_link" target="_blank">Cosmic.link</a>) before submitting to <a class="link" href="javascript:void(0)" @click="promptLobstrVault"><img src="~/assets/images/lobstrvault.png">Lobstr Vault</a></span>
+
+        <span v-if="!stellarGuard && !lobstrVault">Sign and submit (e.g. <a class="link" :href="laboratory_link" target="_blank">Stellar.org</a> or <a class="link" :href="cosmic_link" target="_blank">Cosmic.link</a>) before verifying below</span>
 
         <pre v-html="transaction.transaction" v-if="transaction"></pre>
         <button class="button copy" @click="copy" type="button"> {{copied ? '✔︎ Copied' : 'Copy'}}</button>
@@ -102,6 +106,7 @@
 import moment from 'moment'
 import _ from 'lodash-es'
 import bluebird from 'bluebird'
+import jwt from 'jsonwebtoken'
 
 import {copy, loadScript} from '~/assets/js/misc'
 import {signLedgerTransaction, getLedgerAccount} from '~/assets/js/ledger'
@@ -111,6 +116,8 @@ import $loader from '~/components/loader'
 let server
 
 const data = {
+  isTest: process.env.isTest,
+
   jwt: localStorage.getItem('StellarAuth'),
 
   error: false,
@@ -164,10 +171,12 @@ export default {
       .value()
     },
     laboratory_link() {
+      const {nwk} = jwt.decode(this.jwt)
+
       if (
         this.transaction 
         && this.transaction.transaction
-      ) return `https://www.stellar.org/laboratory/#txsigner?xdr=${encodeURIComponent(this.transaction.transaction)}&network=test`
+      ) return `https://www.stellar.org/laboratory/#txsigner?xdr=${encodeURIComponent(this.transaction.transaction)}&network=${nwk}`
     },
     cosmic_link() {
       if (
@@ -228,11 +237,6 @@ export default {
     signLedgerTransaction,
     getLedgerAccount,
 
-    signOut() {
-      localStorage.removeItem('StellarAuth')
-      _.each(data, (value, key) => {this.$set(this, key, value)})
-    },
-
     async submitForm() {
       this.error = null
       this.loading = true
@@ -266,15 +270,44 @@ export default {
         else {
           await this.postUser()
 
-          if (this.useLedger) this.signLedgerTransaction(this.bip32Path, this.account, data.transaction)
-          .then((transaction) => {
-            this.loading = true
-            data.transaction = transaction.toEnvelope().toXDR().toString('base64')
-            return server.submitTransaction(transaction)
-          })
-          .then(() => new bluebird((resolve) => setTimeout(() => resolve(this.getUser()), 2000)))
-          .catch(this.handleError)
-          .finally(() => this.loading = false)
+          if (this.useLedger) // If Ledger go ahead and submit
+            this.signLedgerTransaction(this.bip32Path, this.account, data.transaction)
+            .then((transaction) => {
+              this.loading = true
+              data.transaction = transaction.toEnvelope().toXDR().toString('base64')
+              return server.submitTransaction(transaction)
+            })
+            .then(() => new bluebird((resolve) => setTimeout(() => resolve(this.getUser()), 2000)))
+            .catch(this.handleError)
+            .finally(() => this.loading = false)
+
+          else // Otherwise check for any known signers for the account
+            server.loadAccount(this.account)
+            .then(async (account) => {
+              let otSigner
+
+              const ogSigner = _.find(account.signers, {key: this.account, weight: 10})
+              const sgSigner = _.find(account.signers, {key: process.env.stellarGuardAccount, weight: 1})
+                    otSigner = _.find(account.signers, (signer) => [ogSigner, sgSigner].indexOf(signer) === -1 && signer.weight === 10)
+
+              if (
+                ogSigner
+                && sgSigner
+                && otSigner
+                && _.filter(account.thresholds, (value) => value === 20).length === 3 
+              ) return this.stellarGuard = true
+
+              const lvSigner = _.find(account.signers, {key: process.env.lobstrVaultAccount, weight: 1})
+                    otSigner = _.find(account.signers, (signer) => [ogSigner, lvSigner].indexOf(signer) === -1 && signer.weight === 10)
+
+              if (
+                ogSigner
+                && lvSigner
+                && otSigner
+                && _.filter(account.thresholds, (value) => value === 20).length === 3 
+              ) return this.lobstrVault = true
+            })
+            .catch((err) => console.error(err))
 
           this.transaction = data
         }
@@ -337,7 +370,6 @@ export default {
       .catch(this.handleError)
       .finally(() => this.loading = false)
     },
-
     sendLobstrVault() {
       this.error = null
       this.loading = true
@@ -348,6 +380,15 @@ export default {
       .then(({data}) => this.lobstrVault = data)
       .catch(this.handleError)
       .finally(() => this.loading = false)
+    },
+
+    promptStellarGuard() {
+      this.transaction.transaction = prompt('Enter the signed XDR to send to StellarGuard');
+      this.sendStellarGuard()
+    },
+    promptLobstrVault() {
+      this.transaction.transaction = prompt('Enter the signed XDR to send to Lobstr Vault');
+      this.sendLobstrVault()
     },
 
     async handleError(err) {
@@ -406,6 +447,11 @@ export default {
 
       else
         this.error = _.get(err, 'response.data')
+    },
+
+    signOut() {
+      localStorage.removeItem('StellarAuth')
+      _.each(data, (value, key) => {this.$set(this, key, value)})
     },
 
     setJwt() {
@@ -500,7 +546,7 @@ p {
     font-size: 14px;
     color: $ui-3;
     margin-top: 5px;
-    line-height: 1.5;
+    line-height: 2;
   }
   .link {
     background-color: $bm-blue;
@@ -515,7 +561,7 @@ p {
     img {
       width: 20px;
       height: 20px;
-      margin-right: 2px;
+      margin-right: 8px;
       display: inline-block;
       position: relative;
       top: 4px;
