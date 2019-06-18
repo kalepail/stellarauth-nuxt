@@ -29,7 +29,7 @@ export default {
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' },
-      { hid: 'description', name: 'description', content: 'Authenticate with your Stellar account' }
+      { hid: 'description', name: 'description', content: 'Authenticate with your Stellar account' },
     ],
     link: [
       // { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
@@ -73,7 +73,10 @@ export default {
   },
 
   axios: {
-    
+  },
+
+  router: {
+    base: isDev ? '/' : path.resolve(__dirname)
   },
 
   server: {

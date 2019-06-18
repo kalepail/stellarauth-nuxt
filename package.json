@@ -1,17 +1,38 @@
 {
   "name": "stellarauth",
+  "description": "Authenticate using your Stellar account",
+  "author": "Tyler van der Hoeven",
+  "version": "0.0.1",
   "private": true,
+  "main": "electron.js",
   "scripts": {
     "dev:test": "NUXT_ENV_NETWORK=test nuxt",
     "dev:public": "NUXT_ENV_NETWORK=public nuxt",
     "build": "nuxt build",
-    "start": "nuxt start",
-    "generate": "nuxt generate",
-    "deploy": "yarn build && surge ./dist https://demo.stellarauth.com"
+    "deploy": "yarn build && surge ./dist https://demo.stellarauth.com",
+    "electron": "yarn build; electron .",
+    "package": "build"
+  },
+  "build": {
+    "appId": "com.stellarauth",
+    "productName": "StellarAuth",
+    "copyright": "Copyright © 2019 Tyler van der Hoeven",
+    "files": [
+      "dist/**/*"
+    ],
+    "directories": {
+      "output": "platforms"
+    },
+    "publish": null,
+    "dmg": {
+      "contents": [
+        
+      ]
+    }
   },
   "dependencies": {
-    "@ledgerhq/hw-app-str": "^4.61.0",
-    "@ledgerhq/hw-transport-webauthn": "^4.61.0",
+    "@ledgerhq/hw-app-str": "^4.62.0",
+    "@ledgerhq/hw-transport-webauthn": "^4.62.0",
     "@nuxtjs/axios": "^5.5.4",
     "bluebird": "^3.5.5",
     "copy-to-clipboard": "^3.2.0",
@@ -21,6 +42,8 @@
     "nuxt": "^2.8.1"
   },
   "devDependencies": {
+    "electron": "^5.0.4",
+    "electron-builder": "^20.43.0",
     "node-sass": "^4.12.0",
     "path": "^0.12.7",
     "sass-loader": "^7.1.0"
