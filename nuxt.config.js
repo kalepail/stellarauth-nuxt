@@ -76,7 +76,7 @@ export default {
   },
 
   router: {
-    base: isDev ? '/' : path.resolve(__dirname)
+    base: isDev ? '/' : './'
   },
 
   server: {

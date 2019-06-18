@@ -10,7 +10,7 @@
     "dev:public": "NUXT_ENV_NETWORK=public nuxt",
     "build": "nuxt build",
     "deploy": "yarn build && surge ./dist https://demo.stellarauth.com",
-    "electron": "yarn build; electron .",
+    "electron": "electron .",
     "package": "build"
   },
   "build": {
@@ -18,7 +18,8 @@
     "productName": "StellarAuth",
     "copyright": "Copyright © 2019 Tyler van der Hoeven",
     "files": [
-      "dist/**/*"
+      "dist/**/*",
+      "electron.js"
     ],
     "directories": {
       "output": "platforms"
