@@ -10,8 +10,8 @@
     "deploy": "yarn build && surge ./dist https://demo.stellarauth.com"
   },
   "dependencies": {
-    "@ledgerhq/hw-app-str": "^4.61.0",
-    "@ledgerhq/hw-transport-webauthn": "^4.61.0",
+    "@ledgerhq/hw-app-str": "^4.62.0",
+    "@ledgerhq/hw-transport-webauthn": "^4.62.0",
     "@nuxtjs/axios": "^5.5.4",
     "bluebird": "^3.5.5",
     "copy-to-clipboard": "^3.2.0",
