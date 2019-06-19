@@ -4,32 +4,24 @@
   "author": "Tyler van der Hoeven",
   "version": "0.0.1",
   "private": true,
-  "main": "electron.js",
+  "main": "electron/main.js",
   "scripts": {
     "dev:test": "NUXT_ENV_NETWORK=test nuxt",
     "dev:public": "NUXT_ENV_NETWORK=public nuxt",
     "build": "nuxt build",
     "deploy": "yarn build && surge ./dist https://demo.stellarauth.com",
-    "electron": "electron .",
-    "package": "build"
+    "dist": "electron-builder"
   },
   "build": {
     "appId": "com.stellarauth",
-    "productName": "StellarAuth",
-    "copyright": "Copyright © 2019 Tyler van der Hoeven",
-    "files": [
-      "dist/**/*",
-      "electron.js"
-    ],
     "directories": {
       "output": "platforms"
     },
-    "publish": null,
-    "dmg": {
-      "contents": [
-        
-      ]
-    }
+    "files": [
+      "electron/main.js",
+      "dist/**/*"
+    ],
+    "mac": {}
   },
   "dependencies": {
     "@ledgerhq/hw-app-str": "^4.62.0",
@@ -47,6 +39,7 @@
     "electron-builder": "^20.43.0",
     "node-sass": "^4.12.0",
     "path": "^0.12.7",
-    "sass-loader": "^7.1.0"
+    "sass-loader": "^7.1.0",
+    "url": "^0.11.0"
   }
 }
